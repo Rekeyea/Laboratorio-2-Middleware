@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
+	xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/jms
+		http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+		http://www.springframework.org/schema/integration/stream
+		http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/integration/ws
+    	http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
+    	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+    	http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc.xsd
+    	http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd">
+
+
+
+	<!-- Beans -->
+
+	<!-- Connection factory para acceder a cola AMQ -->
+	<beans:bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<beans:property name="targetConnectionFactory">
+			<beans:bean class="org.apache.activemq.ActiveMQConnectionFactory">				
+				<beans:property name="brokerURL" value="tcp://localhost:61616"/>
+			</beans:bean>
+		</beans:property>
+		<beans:property name="sessionCacheSize" value="10"/>
+		<beans:property name="cacheProducers" value="false"/>
+	</beans:bean>
+
+	<!-- bean necesario para comunicacion con cola AMQ -->
+	<beans:bean id="bankQueue" class="org.apache.activemq.command.ActiveMQQueue">
+		<beans:constructor-arg value="bankQueue"/>
+	</beans:bean>	 
+	 
+	<beans:bean id="messageTransformerBean" class="middleware.componentes.MessageTransformer"/>	
+	<beans:bean id="transactionAgregatorBean" class="middleware.componentes.TransactionAggregator"/>	
+	<beans:bean id="marshallerBean"	class="middleware.componentes.MarshallerWS" />	
+	<beans:bean id="transformerBean" class="middleware.componentes.Transformador"/>	
+	<beans:bean id="dataSource" class="middleware.componentes.MDataSource"/>	
+	<beans:bean id="messageHandlerBean" class="middleware.componentes.MessageHandler"/>	
+	<beans:bean id="recipentListBean" class="middleware.componentes.RecipentList"/>
+	
+	<task:executor id="taskPoolJms" pool-size="25" rejection-policy="CALLER_RUNS"/>
+	<task:executor id="taskPoolWs" pool-size="25" rejection-policy="CALLER_RUNS"/>
+	<task:executor id="taskPoolDb" pool-size="25" rejection-policy="CALLER_RUNS"/>
+		
+	<!-- Sprint integration. -->
+		 
+	<int:annotation-config/>	
+
+	<context:component-scan base-package="middleware.componentes"/>
+			
+	<!-- Canal de JMS channel adapter, a message transformer -->
+	<int:channel id="jmsChannel">
+		<int:dispatcher task-executor="taskPoolJms"/>
+	</int:channel>
+			
+	<!-- channel adapter para obtener mensajes de la cola JMS. Polling consumer. -->
+	<int-jms:inbound-channel-adapter id="jmsIn" destination="bankQueue" channel="jmsChannel">
+	    <int:poller fixed-rate="100"/>
+	</int-jms:inbound-channel-adapter>	
+	
+
+	<!-- Invalid message channel -->
+	<int:publish-subscribe-channel id="invalidMessageChannel" datatype="middleware.clases.datatypes.TransactionStatus"/>	
+		
+	<!-- Service activator que recibe msgs invalidos y hace algo, para demostrar mas que nada. -->
+	<int:service-activator input-channel="invalidMessageChannel"
+		ref="messageHandlerBean"
+		method="LogInvalid">
+	</int:service-activator>
+	
+	<!-- Service activator que escucha del channel de excepciones de spring. -->
+	<int:service-activator input-channel="errorChannel"
+		ref="messageHandlerBean"
+		method="LogError">
+	</int:service-activator>
+
+	<!-- Message transformer, pasa de datos recibidos de la cola MQ a objetos de transacciones
+		Ademas realiza validaciones y setea el estado en estas.
+	 -->
+	<int:transformer ref="messageTransformerBean" output-channel="recipentListChannel" 
+		input-channel="jmsChannel" method="transformAndValidate">
+	</int:transformer>	
+	
+	<!-- Channel que conecta transformer con router que hace de recipent list -->
+	<int:channel id="recipentListChannel" datatype="middleware.clases.datatypes.TransactionStatus"/>
+
+	<!-- Router que simula hace de list y decide a donde enviar transacciones segun estado -->
+	<int:router
+		input-channel="recipentListChannel" 
+		method="resolveTransaction"
+		ref="recipentListBean">
+	</int:router>
+	
+	
+	<!-- canal de recipent list a agregator de ws-->	
+	<int:channel id="router-aggregator" datatype="middleware.clases.datatypes.TransactionStatus">
+		<int:dispatcher task-executor="taskPoolWs"/>
+	</int:channel>
+	
+	<!-- Canal de aggregator a gateway de web service -->
+	<int:channel id="aggregator-channel" datatype="middleware.clases.datatypes.Transactions"/>
+		
+	<!-- Agregator de transacciones -->
+	<int:aggregator id="TransactionAggregator"
+		input-channel="router-aggregator" output-channel="aggregator-channel"
+		method="addTransaction" ref="transactionAgregatorBean"
+		release-strategy="transactionAgregatorBean"
+		release-strategy-method="releaseChecker"
+		expire-groups-upon-completion="true"
+		correlation-strategy-expression="1">
+	</int:aggregator>
+
+		
+ 	<!-- Envia pedido al ws y recibe respuesta, que envia al ws-log para procesar. -->
+	<int-ws:outbound-gateway id="ws-out"
+		request-channel="aggregator-channel"
+		uri="http://localhost:8080/ACMETransactions/transactions"
+		reply-channel="ws-channel-out" marshaller="marshallerBean"
+		unmarshaller="marshallerBean"
+		
+		>
+	</int-ws:outbound-gateway>
+
+
+	<!-- Channel al que se envian los resultados del WS -->
+	<int:publish-subscribe-channel id="ws-channel-out" datatype="middleware.clases.datatypes.Result"/>
+	
+	<!-- Service activator que escucha a mensajes del web service. -->
+	<int:service-activator input-channel="ws-channel-out"
+		ref="messageHandlerBean"
+		method="LogInvalidMessageWS">
+	</int:service-activator>
+	
+		
+	<!-- Channel que conecta recipent list con transformer de base de datos -->
+	<int:channel id="transformJDBC-channel" datatype="middleware.clases.datatypes.TransactionStatus">
+		<int:dispatcher task-executor="taskPoolDb"/>
+	</int:channel>
+	
+	
+	<!-- Channel que conecta transformer de base de datos con channel adapter de base de datos. -->
+	<int:channel id="pruebaJDBC-channel" datatype="middleware.clases.datatypes.TransactionBD"/>
+	
+	<!-- Translator que pasa a formato de transaccion de bd -->
+	<int:transformer id="transformer" ref="transformerBean" output-channel="pruebaJDBC-channel" 
+	input-channel="transformJDBC-channel" method="transform"></int:transformer>
+	
+	
+	<!-- Channel adapter para insertar en base de datos. -->
+	<int-jdbc:outbound-channel-adapter
+    query="insert into middleware.transactions (id,datetime,transaction_type,
+    commerce_code,commerce_name,card_number,card_type,currency_code,amount) 
+    values (:payload.Id,:payload.Fecha,:payload.Transaccion,:payload.CodigoComercio,:payload.NombreComercio,
+    :payload.NumeroTarjeta,:payload.TipoTarjeta,:payload.CodigoMoneda,:payload.Monto)"
+    data-source="dataSource"
+    channel="pruebaJDBC-channel"/>
+    
+    
+	
+</beans:beans>

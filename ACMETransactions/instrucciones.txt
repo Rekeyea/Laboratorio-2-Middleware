@@ -1,0 +1,23 @@
+========================== Intrucciones de deploy ==========================
+
+-Configurar JAVA_PATH
+
+-Descargar tomcat 8 http://tomcat.apache.org/download-80.cgi
+
+-Descargar librerias necesarias para deploy de servicios JAXWS: https://jax-ws.java.net/
+-- Poner el contenido de la carpeta lib de lo descargado, en la carpeta lib de tomcat.
+
+- Poner libreria de log4j (ACMETransactions/WebContent/WEB-INF/lib/log4j-1.2.17.jar) en la carpeta lib del tomcat.
+-- Esto no deberia ser necesario ya que la libreria se encuentra en la carpeta WeBContent, pero si hay error, seguro es esto.
+
+-Exportar proyecto de WS a un .war (desde eclipse o lo que sea)
+
+-Poner .war en la carpeta webapps de tomcat. Notar que la URL base donde se va a deployar es igual al nombre del war.
+
+El servicio se publica en SERVIDOR/nombredelwar/endpoint donde:
+-SERVIDOR: url:puerto del tomcat
+-nombredelwar: Nombre del war, seguramente ACMETransactions ya que es el nombre del proyecto
+-endpoint: es el endpoint de cada servicio publicado, en este caso es "transactions". Esta definido en el archivo sun-jaxws.xml, que es el encargado de definir todos los endpoints.
+
+-Levantar tomcat desde la carpeta /bin con el comando: startup
+

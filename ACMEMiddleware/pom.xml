@@ -1,0 +1,119 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ACMEMiddleware</groupId>
+  <artifactId>ACMEMiddleware</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jms</artifactId>
+			<version>4.0.3.RELEASE</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-stream</artifactId>
+			<version>4.0.3.RELEASE</version>
+			<scope>compile</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-test</artifactId>
+			<version>4.0.3.RELEASE</version>
+			<scope>test</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>4.0.3.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.9.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-kahadb-store</artifactId>
+			<version>5.9.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-ws</artifactId>
+			<version>4.0.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-jdbc</artifactId>
+			<version>4.0.4.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.32</version>
+		</dependency>		
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+	</dependencies>
+	
+	
+	<build>
+	<plugins>
+	
+		<plugin>
+        	<groupId>org.codehaus.mojo</groupId>
+        	<artifactId>exec-maven-plugin</artifactId>
+        	<version>1.2.1</version>
+       	 	<configuration>
+          		<mainClass>middleware.clases.Main</mainClass>
+        	</configuration>
+      	</plugin>
+      	
+      	<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-jar-plugin</artifactId>
+		  <version>2.4</version>
+		  <configuration>
+			<archive>
+				<manifest>
+					<mainClass>middleware.clases.Main</mainClass>
+				</manifest>
+			</archive>
+		  </configuration>
+ 		</plugin>
+      	
+      	<plugin>
+		    <artifactId>maven-assembly-plugin</artifactId>
+		    <executions>
+		      <execution>
+		        <phase>package</phase>
+		        <goals>
+		          <goal>single</goal>
+		        </goals>
+		      </execution>
+		    </executions>
+		    <configuration>
+		    <archive>
+		   		<manifest>
+					<mainClass>middleware.clases.Main</mainClass>
+				</manifest>
+		    </archive>
+		      <descriptorRefs>
+		        <descriptorRef>jar-with-dependencies</descriptorRef>
+		      </descriptorRefs>
+		    </configuration>
+ 		</plugin>
+      	
+	</plugins>
+	</build>
+	
+	
+</project>
