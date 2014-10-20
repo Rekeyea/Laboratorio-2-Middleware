@@ -18,7 +18,7 @@ public class Main {
 		
 		context.start();
 		
-		System.out.println("Middleware iniciado");
+		System.out.println("Middleware iniciado"); //test
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
