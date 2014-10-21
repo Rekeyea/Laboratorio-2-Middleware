@@ -1,0 +1,1 @@
+Contiene cliente legacy y "nuevo" para pruebas con web service.

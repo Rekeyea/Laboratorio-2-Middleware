@@ -5,6 +5,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
 
 
 
@@ -12,10 +13,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Transactions", namespace="ACME")
 @XmlAccessorType (XmlAccessType.FIELD)
 public class Transactions {
-	List<Transaction> transactionList;
+	
+	@XmlElement(required=true)
+	private List<Transaction> transactionList;
 
 	//@XmlJavaTypeAdapter(TransactionAdapter.class)
-	//@XmlElement(name = "Transaction")
+	
 	public List<Transaction> getTransactionList() {
 		return transactionList;
 	}

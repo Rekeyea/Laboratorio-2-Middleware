@@ -5,22 +5,44 @@ import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="Transaction")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Transaction {
 	
+	@XmlElement( required = true )
 	private long id;
+	
+	@XmlElement( required = true )
 	private String fecha;			//Formato ddmmyy
+	
+	@XmlElement( required = true )
 	private String hora;			//Formato hhmmss
+	
+	@XmlElement( required = true )
 	private String tipo; 			//compra, deposito, consulta de saldo
+	
+	@XmlElement( required = true )
 	private String codigoComercio;
-	private String nombreComercio;	
+	
+	@XmlElement( required = true )
+	private String nombreComercio;
+	
+	@XmlElement( required = true )
 	private String numeroTarjeta;
+	
+	@XmlElement( required = true )
 	private String tipoTarjeta;		//debito, credito, prepaga
+	
+	@XmlElement( required = true )
 	private String codigoMoneda;	//UYU, USD
+	
+	@XmlElement( required = true )
 	private String tipoDispositivo;	//POS, WEB, ATM
+	
+	@XmlElement( required = true )
 	private BigDecimal monto;			
 	
 	

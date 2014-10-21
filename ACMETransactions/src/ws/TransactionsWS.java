@@ -1,5 +1,8 @@
 package ws;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -24,6 +27,10 @@ import logic.interfaces.ITransactions;
 public class TransactionsWS {
 
 	private ITransactions transactionsLogic = Factory.getITransactions();
+	
+	//Diccionario de mensajes procesados.
+	private static MensajesProcesados procesados = new MensajesProcesados(); 
+	
 	final static Logger logger = Logger.getLogger(TransactionsWS.class.getName());
 	
 	/**
@@ -39,8 +46,7 @@ public class TransactionsWS {
 	public Result ReceiveTransactions(@WebParam(name ="Transactions")Transactions data){
 		
 		Result res = new Result();
-		res.setOk(true);
-		res.setMessage("Transacciones procesadas correctamente.");
+		
 		
 		if(data == null){
 			res.setOk(false);
@@ -50,9 +56,18 @@ public class TransactionsWS {
 		else{
 			
 			try{
+				
+				if(data.getMessageId() == null){
+					throw new Exception("Mensaje invalido, no tiene messageId");
+				}
+				
+				procesados.MarcarMensaje(data.getMessageId());
+				
 				transactionsLogic.ProcessTransaction(data.getTransactionList());//(Arrays.asList(data));
 				//transactionsLogic.ProcessTransaction(data.getTransactionList());
 				logger.info(String.format("[ %d ] Transacciones procesadas correctamente.",data.getTransactionList().size()));
+				res.setOk(true);
+				res.setMessage(String.format("[ %d ] Transacciones procesadas correctamente.",data.getTransactionList().size()));
 			}
 			catch(Exception e){
 				res.setOk(false);

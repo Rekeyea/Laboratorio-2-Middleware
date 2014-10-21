@@ -8,13 +8,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 
-@XmlRootElement(name = "Transactions")
+@XmlRootElement(name = "Transactions", namespace="ACME")
 @XmlAccessorType (XmlAccessType.FIELD)
 public class Transactions {
-	List<Transaction> transactionList;
+	
+	@XmlElement( required=true)
+	private List<Transaction> transactionList;
+	
+	@XmlElement( required = true )
+	private String messageId;
 
-	//@XmlJavaTypeAdapter(TransactionAdapter.class)
-	//@XmlElement(name = "Transaction")
+		
 	public List<Transaction> getTransactionList() {
 		return transactionList;
 	}
@@ -31,6 +35,14 @@ public class Transactions {
 			ret= ret + t.getCodigoComercio() + " ";
 		}
 		return ret;
+	}
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
 	}
 		
 }
