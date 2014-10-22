@@ -1,0 +1,4 @@
+Primero se ejecutan los scripts para crear la base de datos.
+Despues se ejecuta el programa CSV-CountryCode para agregar los paises a la base de datos.
+
+Para que ande el servicio web se crea el WAR y se pone en la carpeta "deployments".
