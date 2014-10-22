@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 @XmlRootElement(name = "Transactions")
+//@XmlType(namespace="ACMEv1")
 @XmlAccessorType (XmlAccessType.FIELD)
 
 public class Transactions {
