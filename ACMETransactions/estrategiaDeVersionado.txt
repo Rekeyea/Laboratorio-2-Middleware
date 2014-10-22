@@ -1,0 +1,31 @@
+Para la definición del web service (el WSDL) se decide utilizar una estrategia "FLEXIBLE" (de entre los 3 tipos comunes posibles: STRICT, FLEXIBLE, LOOSE, ver teorico).
+Para esto, se tiene un esquema de versionado de la forma: X.YY, donde X indica la versión mayor e YY la versión menor.
+
+Cuando se realiza un cambio en el web service que no sea "Backwards Compatible" o no compatible con clientes viejos, se incrementa en 1 la versión mayor y se pone en 00 la versión menor, sin embargo, si el cambio es compatible con clientes viejos (por ej, se agregó un nuevo servicio, o un nuevo parametro opcional), entonces se incrementa la versión menor en uno.
+Con esto, aseguramos que los clientes sepan si van a ser compatibles o no con la nueva versión, con solo saber el número de versión modificado.
+Esto tiene la desventaja de necesitar un control riguroso en los cambios para asegurar la compatibilidad hacia atrás si así se decide.
+
+De forma similar, los tipos de datos (en el servicio son los xsd, o esquemas) tendrán un versionado, donde la estrategia y esquema de versionado es la mismo que para el servicio.
+La diferencia se encuentra en que si un cambio requiere cambiar la versión mayor, el cambio también es propagado a la versión del servicio.
+
+
+
+--- Cambios Realizados: ---
+---------------------------
+
+La versión mayor irá en el targetNamespace del WSDL, de forma de generar error a los clientes si intentan usar una versión no compatible.
+Para esto, el targetNamespace será de la forma ACMEvX, siendo X la versión mayor del web service. Para esto el web service actual cambiará su targetNamespace de "ACME" a "ACMEv1" (consideramos que la versión 0 fue la del laboratorio 1)
+
+
+La versión completa irá en... -- algun elemento, de forma de no generar error a clientes.
+
+
+Para los tipos de datos (xsd) la versión mayor irá en el namespace de forma similar, ACMEvX, mientras que la versión completa irá en el atributo "version".
+Si se realiza un cambio que modifique la versión mayor, este se propaga a la versión mayor del targetNamespace del WSDL.
+
+Los cambios en el código fueron:
+- Agregar atributo en la anotación de la definición del web service en la clase TransactionsWS.java: @WebService(...., targetNamespace="ACMEv1")
+
+
+-- Faltan cambios para agregar version completa... ni idea como alterar el XML para modificar el atributo "version" en el xsd y un elemento extra al WSDL...
+-- Versionado de los XSD esta medio mal...

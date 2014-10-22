@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 
 
-@XmlRootElement(name = "Transactions", namespace="ACME")
+@XmlRootElement(name = "Transactions", namespace="ACMEv1")
 @XmlAccessorType (XmlAccessType.FIELD)
 public class Transactions {
 	

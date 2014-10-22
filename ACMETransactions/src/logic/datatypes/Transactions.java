@@ -8,10 +8,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 
-@XmlRootElement(name = "Transactions", namespace="ACME")
+@XmlRootElement(name = "Transactions")
 @XmlAccessorType (XmlAccessType.FIELD)
+
 public class Transactions {
-	
+		
 	@XmlElement( required=true)
 	private List<Transaction> transactionList;
 	

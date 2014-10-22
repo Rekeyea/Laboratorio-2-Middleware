@@ -21,7 +21,8 @@ import logic.interfaces.ITransactions;
 @WebService(name = "transactions",
 			serviceName = "transactions", 
 			portName="transactionsPort",
-			targetNamespace="ACME")
+			targetNamespace="ACMEv1"
+		)
 //@SOAPBinding(style = Style.RPC, parameterStyle = ParameterStyle.WRAPPED)
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use=Use.LITERAL, parameterStyle=ParameterStyle.BARE)
 public class TransactionsWS {
