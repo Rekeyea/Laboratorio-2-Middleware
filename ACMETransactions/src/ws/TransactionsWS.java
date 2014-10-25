@@ -58,7 +58,7 @@ public class TransactionsWS {
 			
 			try{
 				
-				if(data.getMessageId() == null){
+				if(data.getMessageId() == null || data.getMessageId().isEmpty()){
 					throw new Exception("Mensaje invalido, no tiene messageId");
 				}
 				
