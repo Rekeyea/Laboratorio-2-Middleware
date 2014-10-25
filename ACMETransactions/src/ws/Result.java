@@ -2,8 +2,10 @@ package ws;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement()
+//@XmlType(namespace="ACMEv1")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Result {
 	

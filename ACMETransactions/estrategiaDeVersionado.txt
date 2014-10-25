@@ -5,6 +5,8 @@ Cuando se realiza un cambio en el web service que no sea "Backwards Compatible" 
 Con esto, aseguramos que los clientes sepan si van a ser compatibles o no con la nueva versión, con solo saber el número de versión modificado.
 Esto tiene la desventaja de necesitar un control riguroso en los cambios para asegurar la compatibilidad hacia atrás si así se decide.
 
+
+--Por ahora esto no es cierto, y no es necesario por lo que se va a sacar si no es facil agregar el atributo "version" al xsd.
 De forma similar, los tipos de datos (en el servicio son los xsd, o esquemas) tendrán un versionado, donde la estrategia y esquema de versionado es la mismo que para el servicio.
 La diferencia se encuentra en que si un cambio requiere cambiar la versión mayor, el cambio también es propagado a la versión del servicio.
 

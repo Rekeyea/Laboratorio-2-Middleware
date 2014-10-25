@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name="Transaction")
-//@XmlType(namespace="ACMEv3")
+//@XmlType(namespace="ACMEv1")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Transaction {
 	
