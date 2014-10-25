@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
 	xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -9,12 +9,39 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
-http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd">
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
     
-    <flow name="acmeesbFlow1" doc:name="acmeesbFlow1">
+    <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions" doc:name="HTTP Server"/>
+         
 	    <cxf:proxy-service namespace="ACMEv1" service="transactions" payload="body" doc:name="SOAP Server Proxy" enableMuleSoapHeaders="false" wsdlLocation="http://localhost:8080/ACMETransactions/transactions?wsdl"/>
+        <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>
+        <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
+            <choice doc:name="Check if has messageId">
+                <when expression="(message.payload.getElementsByTagName(&quot;messageId&quot;).getLength() == 0)">                    
+                    <expression-component doc:name="Add messageId"><![CDATA[
+						import java.util.UUID;
+						
+						document = message.payload;
+						root = document.getDocumentElement();
+                        newElement = document.createElement("messageId");
+						newElement.setTextContent("legacy-" + UUID.randomUUID().toString());
+						root.appendChild(newElement);					  
+					]]></expression-component>
+					<logger 
+					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName(&quot;messageId&quot;).item(0).getTextContent()]" 
+					level="INFO" doc:name="Log legacy"
+					/>
+                </when>
+                <otherwise>
+                    <logger message="Mensaje tiene messageId, no se realizan acciones." level="INFO" doc:name="Log New"/>
+                </otherwise>
+            </choice>
+        </enricher>
+        <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="body"/>
-	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/transactions" doc:name="SOAP Real Service"/>
+	    
+	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/transactions" doc:name="SOAP Real Service"/>	    
     </flow>
 </mule>
