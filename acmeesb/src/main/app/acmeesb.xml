@@ -32,7 +32,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 					]]></expression-component>
 					<logger 
 					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName('messageId').item(0).getTextContent()]" 
-					level="INFO" doc:name="Log legacy"
+					level="INFO" doc:name="Log Legacy"
 					/>
                 </when>
                 <otherwise>
