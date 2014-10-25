@@ -86,7 +86,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-           <id>2</id>
+            <id>2</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -99,7 +99,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-           <id>3</id>
+            <id>3</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -132,7 +132,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-           <id>2</id>
+            <id>2</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -145,7 +145,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-           <id>3</id>
+            <id>3</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -157,7 +157,7 @@
             <tipoDispositivo>POS</tipoDispositivo>
             <monto>5</monto>
          </transactionList>
-         <messageId>3</messageId>
+         <messageId>2</messageId>
       </acm:Transactions>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="{http://schemas.xmlsoap.org/wsdl/}ACMEv1/transactions/ReceiveTransactionsRequest"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
