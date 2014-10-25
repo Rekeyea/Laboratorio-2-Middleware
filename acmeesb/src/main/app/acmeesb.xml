@@ -19,8 +19,9 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
             <choice doc:name="Check if has messageId">
-                <when expression="(message.payload.getElementsByTagName(&quot;messageId&quot;).getLength() == 0)">                    
-                    <expression-component doc:name="Add messageId"><![CDATA[
+                <when expression="(message.payload.getElementsByTagName('messageId').getLength() == 0)">                    
+                    <expression-component doc:name="Add messageId">
+                    <![CDATA[
 						import java.util.UUID;
 						
 						document = message.payload;
@@ -30,7 +31,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 						root.appendChild(newElement);					  
 					]]></expression-component>
 					<logger 
-					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName(&quot;messageId&quot;).item(0).getTextContent()]" 
+					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName('messageId').item(0).getTextContent()]" 
 					level="INFO" doc:name="Log legacy"
 					/>
                 </when>
