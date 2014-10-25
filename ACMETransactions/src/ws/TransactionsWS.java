@@ -66,9 +66,9 @@ public class TransactionsWS {
 				
 				transactionsLogic.ProcessTransaction(data.getTransactionList());//(Arrays.asList(data));
 				//transactionsLogic.ProcessTransaction(data.getTransactionList());
-				logger.info(String.format("[ %d ] Transacciones procesadas correctamente.",data.getTransactionList().size()));
+				logger.info(String.format("[ %d ] Transacciones procesadas correctamente. Id de mensaje: %s",data.getTransactionList().size(), data.getMessageId()));
 				res.setOk(true);
-				res.setMessage(String.format("[ %d ] Transacciones procesadas correctamente.",data.getTransactionList().size()));
+				res.setMessage(String.format("[ %d ] Transacciones procesadas correctamente. Id de mensaje: %s",data.getTransactionList().size(),data.getMessageId()));
 			}
 			catch(Exception e){
 				res.setOk(false);
