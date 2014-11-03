@@ -22,4 +22,4 @@ Los cambios en el código fueron:
 -- Agregar a MANIFEST.MF la siguiente linea para poder resolver depdendencias necesarias: Dependencies: org.apache.cxf services
 
 - Agregar atributo en la anotación de la definición del web service en la clase TransactionsWS.java: @WebService(...., targetNamespace="ACMEv1")
-- Agregar la siguiente anotacion a la definición del web service en la clase TransactionsWS.java: @WSDLDocumentation(value = "Version: 1.0", placement = WSDLDocumentation.Placement.TOP) para generar el tag de versión.
+- Agregar la siguiente anotación a la definición del web service en la clase TransactionsWS.java: @WSDLDocumentation(value = "Version: 1.0", placement = WSDLDocumentation.Placement.TOP) para generar el tag de versión.
