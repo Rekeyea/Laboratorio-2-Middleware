@@ -1,11 +1,11 @@
-Para la definición del web service (el WSDL) se decide utilizar una estrategia "FLEXIBLE" (de entre los 3 tipos comunes posibles: STRICT, FLEXIBLE, LOOSE, ver teorico).
+Para el versionado del web service (particularmente el WSDL) se decide utilizar una estrategia "FLEXIBLE" (de entre los 3 tipos comunes posibles: STRICT, FLEXIBLE, LOOSE, ver teorico).
 Para esto, se tiene un esquema de versionado de la forma: X.YY, donde X indica la versión mayor e YY la versión menor.
 
 Cuando se realiza un cambio en el web service que no sea "Backwards Compatible" o no compatible con clientes viejos, se incrementa en 1 la versión mayor y se pone en 00 la versión menor, sin embargo, si el cambio es compatible con clientes viejos (por ej, se agregó un nuevo servicio, o un nuevo parametro opcional), entonces se incrementa la versión menor en uno.
 Con esto, aseguramos que los clientes sepan si van a ser compatibles o no con la nueva versión, con solo saber el número de versión modificado.
 Esto tiene la desventaja de necesitar un control riguroso en los cambios para asegurar la compatibilidad hacia atrás si así se decide.
 
-Debido a que el web service es implementado de forma tal que primero se genera el código, y despues el servicio (y por ende WSDL, XSD y demás), no se tiene control absoluto de estos, y por ejemplo, resulta imposible o muy complejo versionar los XSD ya que son auto generados, y por la forma en que se generan, estos heredan el targetNamespace del WSDL al que pertenece (y entonces su versión mayor), y todos tienen version="1.0". En un mundo ideal, estos xsd también estarían bajo control de versiones, siguiendo una estrategia similar al versionado de WSDL, con la diferencia de que un cambio en la versión mayor del xsd, deberá además ser propagado al wsdl, pero por las limitaciones de la implementación, esto no será realizado.
+Debido a que el web service es implementado de forma tal que primero se genera el código, y despues el servicio (y por ende WSDL, XSD y demás), no se tiene control absoluto de estos, y por ejemplo, resulta imposible o muy complejo versionar los XSD ya que son auto generados, y por la forma en que se generan, estos heredan el targetNamespace del WSDL al que pertenece (y entonces su versión mayor, ver cambios realizados), y todos tienen version="1.0". En un mundo ideal, estos xsd también estarían bajo control de versiones, siguiendo una estrategia similar al versionado de WSDL, con la diferencia de que un cambio en la versión mayor del xsd, deberá además ser propagado al wsdl, pero por las limitaciones de la implementación, esto no será realizado.
 
 
 --- Cambios Realizados: ---
