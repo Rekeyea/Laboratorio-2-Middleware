@@ -22,7 +22,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
                 <when expression="(message.payload.getElementsByTagName('messageId').getLength() == 0)">                    
                     <expression-component doc:name="Add messageId">
                     <![CDATA[
-						import java.util.UUID;
+						
 						import java.security.MessageDigest;
 						import java.math.BigInteger;
 						
