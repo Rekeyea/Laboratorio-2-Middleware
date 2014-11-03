@@ -13,9 +13,9 @@ http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/cu
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
-        <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions" doc:name="HTTP Server"/>
+        <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
          
-	    <cxf:proxy-service namespace="ACMEv1" service="transactions" payload="body" doc:name="SOAP Server Proxy" enableMuleSoapHeaders="false" wsdlLocation="http://localhost:8080/ACMETransactions/transactions?wsdl"/>
+	    <cxf:proxy-service namespace="ACMEv1" service="transactions" payload="body" doc:name="SOAP Server Proxy" enableMuleSoapHeaders="false" wsdlLocation="http://localhost:8080/ACMETransactions/services?wsdl"/>
         <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
             <choice doc:name="Check if has messageId">
@@ -23,12 +23,23 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
                     <expression-component doc:name="Add messageId">
                     <![CDATA[
 						import java.util.UUID;
+						import java.security.MessageDigest;
+						import java.math.BigInteger;
 						
-						document = message.payload;
+						MessageDigest md = MessageDigest.getInstance("SHA-256");
+						
+						document = message.payload;								
 						root = document.getDocumentElement();
-                        newElement = document.createElement("messageId");
-						newElement.setTextContent("legacy-" + UUID.randomUUID().toString());
-						root.appendChild(newElement);					  
+						
+						md.update(root.getTextContent().getBytes());	
+											
+                        newElement = document.createElement("messageId"); 
+						BigInteger number = new BigInteger(1, md.digest());
+      					String data = number.toString(16);
+                        
+						newElement.setTextContent("legacy-" + data);
+						root.appendChild(newElement);	
+								  
 					]]></expression-component>
 					<logger 
 					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName('messageId').item(0).getTextContent()]" 
@@ -43,6 +54,6 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="body"/>
 	    
-	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/transactions" doc:name="SOAP Real Service"/>	    
+	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>
 </mule>

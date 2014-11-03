@@ -5,7 +5,7 @@ Cuando se realiza un cambio en el web service que no sea "Backwards Compatible" 
 Con esto, aseguramos que los clientes sepan si van a ser compatibles o no con la nueva versión, con solo saber el número de versión modificado.
 Esto tiene la desventaja de necesitar un control riguroso en los cambios para asegurar la compatibilidad hacia atrás si así se decide.
 
-Debido a que el web service es implementado de forma tal que primero se genera el código, y despues el servicio (y por ende WSDL, XSD y demás), no se tiene control absoluto de estos, y por ejemplo, resulta imposible o muy complejo versionar los XSD, por lo que estos heredan el targetNamespace del WSDL al que pertenece (y entonces su versión mayor)
+Debido a que el web service es implementado de forma tal que primero se genera el código, y despues el servicio (y por ende WSDL, XSD y demás), no se tiene control absoluto de estos, y por ejemplo, resulta imposible o muy complejo versionar los XSD ya que son auto generados, y por la forma en que se generan, estos heredan el targetNamespace del WSDL al que pertenece (y entonces su versión mayor), y todos tienen version="1.0". En un mundo ideal, estos xsd también estarían bajo control de versiones, siguiendo una estrategia similar al versionado de WSDL, con la diferencia de que un cambio en la versión mayor del xsd, deberá además ser propagado al wsdl, pero por las limitaciones de la implementación, esto no será realizado.
 
 
 --- Cambios Realizados: ---
@@ -14,8 +14,12 @@ Debido a que el web service es implementado de forma tal que primero se genera e
 La versión mayor irá en el targetNamespace del WSDL, de forma de generar error a los clientes si intentan usar una versión no compatible.
 Para esto, el targetNamespace será de la forma ACMEvX, siendo X la versión mayor del web service. Para esto el web service actual cambiará su targetNamespace de "ACME" a "ACMEv1" (consideramos que la versión 0 fue la del laboratorio 1)
 
-La versión completa irá en... -- algun elemento, de forma de no generar error a clientes.
+La versión completa irá en en un tag de la forma: <wsdl:documentation>Version: X.YY</wsdl:documentation>
 
 Los cambios en el código fueron:
-- Agregar atributo en la anotación de la definición del web service en la clase TransactionsWS.java: @WebService(...., targetNamespace="ACMEv1")
+- Migrar de Apache Tomcat a JBoss EAP 6.3 para poder utilziar apache CXF de forma nativa para agregar tags extra al wsdl. Para esto fue necesario:
+-- Modificar levemente web.xml para aceptar configuraciones de deploy JBOSS
+-- Agregar a MANIFEST.MF la siguiente linea para poder resolver depdendencias necesarias: Dependencies: org.apache.cxf services
 
+- Agregar atributo en la anotación de la definición del web service en la clase TransactionsWS.java: @WebService(...., targetNamespace="ACMEv1")
+- Agregar la siguiente anotacion a la definición del web service en la clase TransactionsWS.java: @WSDLDocumentation(value = "Version: 1.0", placement = WSDLDocumentation.Placement.TOP) para generar el tag de versión.

@@ -1,7 +1,6 @@
 package ws;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.cxf.annotations.WSDLDocumentation;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -25,6 +24,7 @@ import logic.interfaces.ITransactions;
 		)
 //@SOAPBinding(style = Style.RPC, parameterStyle = ParameterStyle.WRAPPED)
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT, use=Use.LITERAL, parameterStyle=ParameterStyle.BARE)
+@WSDLDocumentation(value = "Version: 1.0", placement = WSDLDocumentation.Placement.TOP)
 public class TransactionsWS {
 
 	private ITransactions transactionsLogic = Factory.getITransactions();
