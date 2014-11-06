@@ -14,11 +14,12 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
-        <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
-        <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>
+        <cxf:proxy-service  payload="body" doc:name="SOAP Server Proxy"/>
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
             <choice doc:name="Check if has messageId">
-                <when expression="(message.payload.getElementsByTagName('messageId').getLength() == 0)">                    
+                <when expression= "xpath://*[contains(namespace-uri(), 'ACME')]">
+                <!-- "(message.payload.getElementsByTagName('messageId').getLength() == 0)"> -->
+                    <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>                    
                     <expression-component doc:name="Add messageId">
                     <![CDATA[
 						
@@ -37,30 +38,21 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 						BigInteger number = new BigInteger(1, md.digest());
       					String data = number.toString(16);
                         newElement.setTextContent("legacy-" + data);
-
-						//elements list
-						 listnode = document.getElementsByTagName("acm:Transactions");
-						listnode.item(0).appendChild(newElement);
-						//listnode.item(0).removeAttribute("xmlns:acm");
-
-						//funciona
-						listnode.item(0).setAttribute("xmlns:acm", "ACMEv1");
-						//root = document.getElementsByTagName("Transactions");
-						//root.appendChild(newElement);	
+						root.appendChild(newElement);	
 								  
 					]]></expression-component>
 					<logger 
 					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName('messageId').item(0).getTextContent()]" 
 					level="INFO" doc:name="Log Legacy"
 					/>
+                    <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
                 </when>
                 <otherwise>
                     <logger message="Mensaje tiene messageId, no se realizan acciones." level="INFO" doc:name="Log New"/>
                 </otherwise>
             </choice>
         </enricher>
-        <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
-	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
+	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="body"/>
 	    
 	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>
