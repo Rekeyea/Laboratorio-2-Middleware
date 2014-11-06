@@ -14,8 +14,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
-         
-	    <cxf:proxy-service namespace="ACMEv1" service="transactions" payload="body" doc:name="SOAP Server Proxy" enableMuleSoapHeaders="false" wsdlLocation="http://localhost:8080/ACMETransactions/services?wsdl"/>
+        <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
         <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
             <choice doc:name="Check if has messageId">
@@ -28,17 +27,26 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 						
 						MessageDigest md = MessageDigest.getInstance("SHA-256");
 						
-						document = message.payload;								
+						document = message.payload;		
 						root = document.getDocumentElement();
-						
+						root.setAttribute("xmlns:acm", "ACMEv1");
+
 						md.update(root.getTextContent().getBytes());	
 											
                         newElement = document.createElement("messageId"); 
 						BigInteger number = new BigInteger(1, md.digest());
       					String data = number.toString(16);
-                        
-						newElement.setTextContent("legacy-" + data);
-						root.appendChild(newElement);	
+                        newElement.setTextContent("legacy-" + data);
+
+						//elements list
+						 listnode = document.getElementsByTagName("acm:Transactions");
+						listnode.item(0).appendChild(newElement);
+						//listnode.item(0).removeAttribute("xmlns:acm");
+
+						//funciona
+						listnode.item(0).setAttribute("xmlns:acm", "ACMEv1");
+						//root = document.getElementsByTagName("Transactions");
+						//root.appendChild(newElement);	
 								  
 					]]></expression-component>
 					<logger 
@@ -52,7 +60,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
             </choice>
         </enricher>
         <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
-	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="body"/>
+	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
 	    
 	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>
