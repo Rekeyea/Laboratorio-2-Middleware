@@ -1,0 +1,1 @@
+Ejecutar los dos scripts Ejercicio3_persona.sql y Ejercicio3_codigopais.sql antes de correr el servicio web.
