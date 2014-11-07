@@ -14,6 +14,13 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
+        <set-variable variableName="initM" value="#[server.nanoTime()]" doc:name="InitMiddTime"/>
+        <response>
+            <logger message="Midd:[ #[flowVars['initM']] , #[flowVars['endM']] ]      WS:[ #[flowVars['initWS']] ,  #[flowVars['endWS']]   RespWS: #[(flowVars['endWS'] - flowVars['initWS'])/1e6]     RespMidd: #[(flowVars['endM'] - flowVars['initM'])/1e6] " level="INFO" doc:name="Logger Time"/>
+        </response>
+        <response>
+            <set-variable variableName="endM" value="#[server.nanoTime()]" doc:name="EndMiddTime"/>
+        </response>
         <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
         
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
@@ -71,6 +78,10 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
             </choice>
         </enricher>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
+        <response>
+            <set-variable variableName="endWS" value="#[server.nanoTime()]" doc:name="EndWSTime"/>
+        </response>
+        <set-variable variableName="initWS" value="#[server.nanoTime()]" doc:name="InitWSTime"/>
 	    
 	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>
