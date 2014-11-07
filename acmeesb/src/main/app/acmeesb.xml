@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
 http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
-    
+    <global-property name="legacy" value="false" doc:name="Global Property"/>
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
         <set-variable variableName="initM" value="#[server.nanoTime()]" doc:name="InitMiddTime"/>
@@ -27,47 +27,10 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         	
             <choice doc:name="Check if has legacy namespace">
                 <when expression= "xpath://*[namespace-uri()='ACME']">
-                                    
-                    <expression-component doc:name="Add messageId/change namespace">
-                    <![CDATA[
-						
-						import java.security.MessageDigest;
-						import java.math.BigInteger;						
-						import org.dom4j.*;					
-						
-						document = message.payload;
+                    <component class="org.midd.customtransformer.TransformXML" doc:name="Java"/>
 
-						String xmlData = document.asXML();
-						
-						//change namespace
-						xmlData = xmlData.replaceAll("\"ACME\"","\"ACMEv1\"");
-		
-						//get new document and change payload
-						document = DocumentHelper.parseText(xmlData);
-						message.payload = document;
-								
-
-						//Ruta exacta para asegurarme que lo agrego en el lugar correcto.
-						Node transNode = document.selectSingleNode( "/*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='Transactions']" );
-						
-						//Solo agrego el nodo si no existe.
-						if(transNode.selectSingleNode("./*[local-name()='messageId']") == null){		
-						
-							//generate UUID -- Data
-							MessageDigest md = MessageDigest.getInstance("SHA-256");
-							md.update(xmlData.getBytes());
-							BigInteger number = new BigInteger(1, md.digest());
-		      				String hash = number.toString(16);
-																	
-							Element messageIdNode = transNode.addElement("messageId");                     												
-							messageIdNode.setText("legacy-" + hash);						
-						}; //por alguna razon no anda si no hay nada despues del if.
-												
-						
-							  
-					]]></expression-component>
 					<logger 
-					message="Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
+					message="#[flowVars['legacy']] Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
 					level="INFO" doc:name="Log Legacy"
 					/>
                 </when>
@@ -76,6 +39,9 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
                 </otherwise>
             </choice>
         </enricher>
+        <response>
+            <component class="org.midd.customtransformer.ParserComponent" doc:name="ParserComponent"/>
+        </response>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
         <response>
             <set-variable variableName="endWS" value="#[server.nanoTime()]" doc:name="EndWSTime"/>
