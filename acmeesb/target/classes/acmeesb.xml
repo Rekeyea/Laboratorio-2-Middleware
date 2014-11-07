@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         <response>
             <set-variable variableName="endM" value="#[server.nanoTime()]" doc:name="EndMiddTime"/>
         </response>
-        <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
+        <cxf:proxy-service payload="envelope" doc:name="SOAP Server Proxy" namespace="ACMEv1" service="transactions" wsdlLocation="http://localhost:8080/ACMETransactions/services?wsdl"/>
         
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
         	
