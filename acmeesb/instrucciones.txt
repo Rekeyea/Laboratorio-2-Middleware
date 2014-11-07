@@ -1,0 +1,5 @@
+- Descargar Anypoint studio (eclipse para mule ESB)
+- Cargar proyecto, y darle play.
+
+Deploy en stand alone de mule ESB para producción es pago.
+Deploy en JBOSS o TOMCAT es complejo.

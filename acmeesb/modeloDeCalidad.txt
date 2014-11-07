@@ -1,0 +1,54 @@
+Modelo de calidad a utilizar: S-Cube, categoría: Performance, Atributo: Response Time.
+El atributo Tiempo de Respuesta del modelo S-Cube es uno de los tantos atributos que existen en el modelo, para obtener una visión mas precisa de la calidad del web service deberíamos obtener valores de más atributos de calidad pero el tiempo de respuesta es el único que se pide en este obligatorio.
+
+Tirar mas fruta del teorico???
+
+Estrategia: 
+- Implementar timestamps dentro del ESB, que midan tiempos desde que el mensaje llega a este, hasta que sale, y tomando mediciones intermedias de tiempos que se utiliza en llamar al web service.
+- Utilizar un conjunto de datos reducidos y simples, y enviar pedidos desde SOAPUI al ESB de forma secuencial uno por uno.
+- Sacar promedio.
+
+Datos:
+
+Mensaje enviado: grupo de 3 transacciones válidas.
+
+-- Valores --
+RespMidd: Tiempo desde que el mensaje llega al middleware (no se cuenta tiempo en la red entre el cliente y ESB), hasta que se envía la respuesta (no se cuenta tiempo en la red desde que la respuesta sale del ESB hasta que llegue al cliente)
+En ambos casos el tiempo utilizado en parsear el pedido HTTP a mensaje de ESB como el tiempo en convertir el mensaje ESB a una respuesta HTTP no son tenidos en cuenta. Esto por como están puestos los logs que generan los timestamps. Si se quisiera tener estos tiempos, hay que medir el tiempo desde afuera del ESB, pero lo consideramos despreciable.
+
+RespWS: Tiempo desde que el ESB envía el pedido al web service hasta que recibe la respuesta.
+
+Tiempo solo en middleware: Tiempo total en el middleware - tiempo utilizado en el web service.
+
+
+------------------------------------- Pruebas -------------------------------------
+
+10 Requests con cliente legacy sin duplicados.
+
+INFO  2014-11-07 20:45:05,612 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510015096998930 , End: 1510015116349671 ]      WS:[ Start: 1510015105103221 , End: 1510015110405156   RespMidd: 19.350741 ms   RespWS: 5.301935 ms   Tiempo solo en middleware: 14.048806 ms
+INFO  2014-11-07 20:45:08,425 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510017912422412 , End: 1510017929481782 ]      WS:[ Start: 1510017920778164 , End: 1510017924708061   RespMidd: 17.05937 ms   RespWS: 3.929897 ms   Tiempo solo en middleware: 13.129473 ms
+INFO  2014-11-07 20:45:11,592 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510021081071867 , End: 1510021096691386 ]      WS:[ Start: 1510021087084196 , End: 1510021091632848   RespMidd: 15.619519 ms   RespWS: 4.548652 ms   Tiempo solo en middleware: 11.070867 ms
+INFO  2014-11-07 20:45:14,368 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510023855693109 , End: 1510023871132280 ]      WS:[ Start: 1510023862133581 , End: 1510023866751513   RespMidd: 15.439171 ms   RespWS: 4.617932 ms   Tiempo solo en middleware: 10.821239 ms
+INFO  2014-11-07 20:45:17,345 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510026832740543 , End: 1510026850010318 ]      WS:[ Start: 1510026839311144 , End: 1510026843815076   RespMidd: 17.269775 ms   RespWS: 4.503932 ms   Tiempo solo en middleware: 12.765843 ms
+INFO  2014-11-07 20:45:22,268 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510031752087288 , End: 1510031772318507 ]      WS:[ Start: 1510031758998057 , End: 1510031765405539   RespMidd: 20.231219 ms   RespWS: 6.407482 ms   Tiempo solo en middleware: 13.823737 ms
+INFO  2014-11-07 20:45:25,407 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510034896206866 , End: 1510034911622943 ]      WS:[ Start: 1510034902491183 , End: 1510034906692702   RespMidd: 15.416077 ms   RespWS: 4.201519 ms   Tiempo solo en middleware: 11.214558 ms
+INFO  2014-11-07 20:45:28,640 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510038128219640 , End: 1510038144388633 ]      WS:[ Start: 1510038134600362 , End: 1510038139533536   RespMidd: 16.168993 ms   RespWS: 4.933174 ms   Tiempo solo en middleware: 11.235819 ms
+INFO  2014-11-07 20:45:32,168 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510041656409442 , End: 1510041673126810 ]      WS:[ Start: 1510041663568739 , End: 1510041668293341   RespMidd: 16.717368 ms   RespWS: 4.724602 ms   Tiempo solo en middleware: 11.992766 ms
+INFO  2014-11-07 20:45:35,304 [[acmeesb].connector.http.mule.default.receiver.04] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510044792074664 , End: 1510044808643575 ]      WS:[ Start: 1510044799173845 , End: 1510044803945732   RespMidd: 16.568911 ms   RespWS: 4.771887 ms   Tiempo solo en middleware: 11.797024 ms
+
+
+10 Requests con cliente nuevo sin duplicados.
+
+INFO  2014-11-07 20:47:33,426 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510162921016428 , End: 1510162930036021 ]      WS:[ Start: 1510162923444893 , End: 1510162928254170   RespMidd: 9.019593 ms   RespWS: 4.809277 ms   Tiempo solo en middleware: 4.210316 ms
+INFO  2014-11-07 20:47:38,853 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510168351183863 , End: 1510168358117725 ]      WS:[ Start: 1510168353096576 , End: 1510168357181529   RespMidd: 6.933862 ms   RespWS: 4.084953 ms   Tiempo solo en middleware: 2.848909 ms
+INFO  2014-11-07 20:47:42,440 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510171935943881 , End: 1510171943388729 ]      WS:[ Start: 1510171938017148 , End: 1510171942076075   RespMidd: 7.444848 ms   RespWS: 4.058927 ms   Tiempo solo en middleware: 3.385921 ms
+INFO  2014-11-07 20:47:45,655 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510175152378924 , End: 1510175160096493 ]      WS:[ Start: 1510175154733343 , End: 1510175158766611   RespMidd: 7.717569 ms   RespWS: 4.033268 ms   Tiempo solo en middleware: 3.684301 ms
+INFO  2014-11-07 20:47:49,183 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510178680261914 , End: 1510178687400685 ]      WS:[ Start: 1510178682430488 , End: 1510178686308334   RespMidd: 7.138771 ms   RespWS: 3.877846 ms   Tiempo solo en middleware: 3.260925 ms
+INFO  2014-11-07 20:47:52,286 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510181783635703 , End: 1510181790485623 ]      WS:[ Start: 1510181785540719 , End: 1510181789391073   RespMidd: 6.84992 ms   RespWS: 3.850354 ms   Tiempo solo en middleware: 2.999566 ms
+INFO  2014-11-07 20:47:55,719 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510185216398753 , End: 1510185223814643 ]      WS:[ Start: 1510185218515641 , End: 1510185222730723   RespMidd: 7.41589 ms   RespWS: 4.215082 ms   Tiempo solo en middleware: 3.200808 ms
+INFO  2014-11-07 20:47:59,409 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510188903892911 , End: 1510188913389766 ]      WS:[ Start: 1510188905990005 , End: 1510188911813922   RespMidd: 9.496855 ms   RespWS: 5.823917 ms   Tiempo solo en middleware: 3.672938 ms
+INFO  2014-11-07 20:48:02,695 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510192191829288 , End: 1510192199712909 ]      WS:[ Start: 1510192193790021 , End: 1510192198641086   RespMidd: 7.883621 ms   RespWS: 4.851065 ms   Tiempo solo en middleware: 3.032556 ms
+INFO  2014-11-07 20:48:06,383 [[acmeesb].connector.http.mule.default.receiver.05] org.mule.api.processor.LoggerMessageProcessor: Midd:[ Start: 1510195880241314 , End: 1510195887725018 ]      WS:[ Start: 1510195882280491 , End: 1510195886631933   RespMidd: 7.483704 ms   RespWS: 4.351442 ms   Tiempo solo en middleware: 3.132262 ms
+
+
+Sacar promedios.... Analzar.. bla bla
