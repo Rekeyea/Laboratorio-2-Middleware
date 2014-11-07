@@ -16,31 +16,27 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
         <set-variable variableName="initM" value="#[server.nanoTime()]" doc:name="InitMiddTime"/>
         <response>
-            <logger message="Midd:[ #[flowVars['initM']] , #[flowVars['endM']] ]      WS:[ #[flowVars['initWS']] ,  #[flowVars['endWS']]   RespWS: #[(flowVars['endWS'] - flowVars['initWS'])/1e6]     RespMidd: #[(flowVars['endM'] - flowVars['initM'])/1e6] " level="INFO" doc:name="Logger Time"/>
+            <logger message="Midd:[ Start: #[flowVars['initM']] , End: #[flowVars['endM']] ]      WS:[ Start: #[flowVars['initWS']] , End: #[flowVars['endWS']]   RespMidd: #[(flowVars['endM'] - flowVars['initM'])/1e6 ] ms   RespWS: #[(flowVars['endWS'] - flowVars['initWS'])/1e6] ms   Tiempo solo en middleware: #[((flowVars['endM'] - flowVars['initM']) - (flowVars['endWS'] - flowVars['initWS']))/1e6] ms" level="INFO" doc:name="Logger Time"/>
         </response>
         <response>
             <set-variable variableName="endM" value="#[server.nanoTime()]" doc:name="EndMiddTime"/>
         </response>
         <cxf:proxy-service payload="envelope" doc:name="SOAP Server Proxy" namespace="ACMEv1" service="transactions" wsdlLocation="http://localhost:8080/ACMETransactions/services?wsdl"/>
-        
-        <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
-        	
-            <choice doc:name="Check if has legacy namespace">
-                <when expression= "xpath://*[namespace-uri()='ACME']">
-                    <component class="org.midd.customtransformer.TransformXML" doc:name="Java"/>
+        <choice doc:name="Check if has legacy namespace">
+            <when expression= "xpath://*[namespace-uri()='ACME']">
+                <component class="org.midd.customtransformer.TransformXML" doc:name="Change namespace / add messageId"/>
 
 					<logger 
-					message="#[flowVars['legacy']] Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
+					message="Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
 					level="INFO" doc:name="Log Legacy"
 					/>
-                </when>
-                <otherwise>
-                    <logger message="Mensaje es de cliente nuevo, no se realizan acciones." level="INFO" doc:name="Log New"/>
-                </otherwise>
-            </choice>
-        </enricher>
+            </when>
+            <otherwise>
+                <logger message="Mensaje es de cliente nuevo, no se realizan acciones." level="INFO" doc:name="Log New"/>
+            </otherwise>
+        </choice>
         <response>
-            <component class="org.midd.customtransformer.ParserComponent" doc:name="ParserComponent"/>
+            <component class="org.midd.customtransformer.ParserComponent" doc:name="Change response namespace if legacy"/>
         </response>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
         <response>

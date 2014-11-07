@@ -71,7 +71,7 @@
       <acm:Transactions>
          <!--1 or more repetitions:-->
          <transactionList>
-            <id>423</id>
+            <id>2333</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -84,7 +84,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-            <id>23</id>
+            <id>4235</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -97,7 +97,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-            <id>3</id>
+            <id>5532</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -107,8 +107,8 @@
             <tipoTarjeta>debito</tipoTarjeta>
             <codigoMoneda>USD</codigoMoneda>
             <tipoDispositivo>POS</tipoDispositivo>
-            <monto>5</monto>
-         </transactionList>       
+            <monto>5633</monto>
+         </transactionList>     
          
       </acm:Transactions>
    </soapenv:Body>
@@ -156,7 +156,7 @@
             <tipoDispositivo>POS</tipoDispositivo>
             <monto>5</monto>
          </transactionList>
-         <messageId>223</messageId>
+         <messageId>12223</messageId>
       </acm:Transactions>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ACMEv1/transactions/ReceiveTransactions"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

@@ -13,16 +13,18 @@ import java.math.BigInteger;
 public class TransformXML implements Callable {
 
 	public Object onCall(MuleEventContext context) throws Exception {
-		context.getMuleContext().getRegistry().registerObject("legacy", "true");
-		Document document = (Document) context.getMessage().getPayload();
+					
+		
+		Document document = (Document)context.getMessage().getPayload();
 		String xmlData = document.asXML();
 		
 		//change namespace
 		xmlData = xmlData.replaceAll("\"ACME\"","\"ACMEv1\"");
 
 		//get new document and change payload
-		document = DocumentHelper.parseText(xmlData);
+		document = DocumentHelper.parseText(xmlData);		
 		context.getMessage().setPayload(document);	
+		
 		//Ruta exacta para asegurarme que lo agrego en el lugar correcto.
 		Node transNode = document.selectSingleNode( "/*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='Transactions']" );
 
@@ -37,6 +39,10 @@ public class TransformXML implements Callable {
 			Element messageIdNode = ((Element)transNode).addElement("messageId");                     												
 			messageIdNode.setText("legacy-" + hash);						
 		}
+		
+		
+		context.getSession().setProperty("isLegacy",  new Boolean(true));		
+		
 			  
 		return context.getMessage().getPayload();
 	}
