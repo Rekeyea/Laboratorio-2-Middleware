@@ -14,14 +14,20 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
+        <set-variable variableName="initM" value="#[server.nanoTime()]" doc:name="InitMiddTime"/>
+        <response>
+            <logger message="Midd:[ #[flowVars['initM']] , #[flowVars['endM']] ]      WS:[ #[flowVars['initWS']] ,  #[flowVars['endWS']]   RespWS: #[(flowVars['endWS'] - flowVars['initWS'])/1e6]     RespMidd: #[(flowVars['endM'] - flowVars['initM'])/1e6] " level="INFO" doc:name="Logger Time"/>
+        </response>
+        <response>
+            <set-variable variableName="endM" value="#[server.nanoTime()]" doc:name="EndMiddTime"/>
+        </response>
         <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
         
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
         	
             <choice doc:name="Check if has legacy namespace">
                 <when expression= "xpath://*[namespace-uri()='ACME']">
-                <!-- "(message.payload.getElementsByTagName('messageId').getLength() == 0)"> -->
-                    
+                                    
                     <expression-component doc:name="Add messageId/change namespace">
                     <![CDATA[
 						
@@ -30,42 +36,40 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 						import org.dom4j.*;					
 						
 						document = message.payload;
+
 						String xmlData = document.asXML();
-						MessageDigest md = MessageDigest.getInstance("SHA-256");
-						md.update(xmlData.getBytes());
 						
+						//change namespace
+						xmlData = xmlData.replaceAll("\"ACME\"","\"ACMEv1\"");
+		
+						//get new document and change payload
+						document = DocumentHelper.parseText(xmlData);
+						message.payload = document;
+								
+
 						//Ruta exacta para asegurarme que lo agrego en el lugar correcto.
 						Node transNode = document.selectSingleNode( "/*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='Transactions']" );
 						
 						//Solo agrego el nodo si no existe.
-						if(transNode.selectSingleNode("./*[local-name()='messageId']")==null){												
-												
-							Element messageIdNode = transNode.addElement("messageId");
-							
+						if(transNode.selectSingleNode("./*[local-name()='messageId']") == null){		
+						
+							//generate UUID -- Data
+							MessageDigest md = MessageDigest.getInstance("SHA-256");
+							md.update(xmlData.getBytes());
 							BigInteger number = new BigInteger(1, md.digest());
-	      					String data = number.toString(16);
-	                        												
-							messageIdNode.setText("legacy-" + data);						
-						}
-						
+		      				String hash = number.toString(16);
+																	
+							Element messageIdNode = transNode.addElement("messageId");                     												
+							messageIdNode.setText("legacy-" + hash);						
+						}; //por alguna razon no anda si no hay nada despues del if.
 												
-						String nuevoXML = document.asXML();
 						
-						//Reemplazo namespace
-						nuevoXML = nuevoXML.replaceAll("\"ACME\"","\"ACMEv1\"");
-						
-						Document newDocument = DocumentHelper.parseText(nuevoXML);
-						message.payload = newDocument;
-						
-						System.out.println(newDocument.asXML());
-						
-								  
+							  
 					]]></expression-component>
 					<logger 
 					message="Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
 					level="INFO" doc:name="Log Legacy"
 					/>
-                    <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
                 </when>
                 <otherwise>
                     <logger message="Mensaje es de cliente nuevo, no se realizan acciones." level="INFO" doc:name="Log New"/>
@@ -73,6 +77,10 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
             </choice>
         </enricher>
 	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
+        <response>
+            <set-variable variableName="endWS" value="#[server.nanoTime()]" doc:name="EndWSTime"/>
+        </response>
+        <set-variable variableName="initWS" value="#[server.nanoTime()]" doc:name="InitWSTime"/>
 	    
 	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>

@@ -27,8 +27,7 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
         	
             <choice doc:name="Check if has legacy namespace">
                 <when expression= "xpath://*[namespace-uri()='ACME']">
-                <!-- "(message.payload.getElementsByTagName('messageId').getLength() == 0)"> -->
-                    
+                                    
                     <expression-component doc:name="Add messageId/change namespace">
                     <![CDATA[
 						
@@ -39,33 +38,33 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 						document = message.payload;
 
 						String xmlData = document.asXML();
+						
 						//change namespace
 						xmlData = xmlData.replaceAll("\"ACME\"","\"ACMEv1\"");
 		
-						//generate UUID -- Data
-						MessageDigest md = MessageDigest.getInstance("SHA-256");
-						md.update(xmlData.getBytes());
-						BigInteger number = new BigInteger(1, md.digest());
-	      				String data = number.toString(16);
+						//get new document and change payload
+						document = DocumentHelper.parseText(xmlData);
+						message.payload = document;
+								
 
 						//Ruta exacta para asegurarme que lo agrego en el lugar correcto.
 						Node transNode = document.selectSingleNode( "/*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='Transactions']" );
 						
 						//Solo agrego el nodo si no existe.
-						if(transNode.selectSingleNode("./*[local-name()='messageId']")==null){													
-							Element messageIdNode = transNode.addElement("messageId");                     												
-							messageIdNode.setText("legacy-" + data);						
-						}
-								
-						String nuevoXML = document.asXML();
+						if(transNode.selectSingleNode("./*[local-name()='messageId']") == null){		
 						
-						//Reemplazo namespace nuevamente
-						nuevoXML = nuevoXML.replaceAll("\"ACME\"","\"ACMEv1\"");
-						//transformo a doc
-						Document newDocument = DocumentHelper.parseText(nuevoXML);
-						message.payload = newDocument;
+							//generate UUID -- Data
+							MessageDigest md = MessageDigest.getInstance("SHA-256");
+							md.update(xmlData.getBytes());
+							BigInteger number = new BigInteger(1, md.digest());
+		      				String hash = number.toString(16);
+																	
+							Element messageIdNode = transNode.addElement("messageId");                     												
+							messageIdNode.setText("legacy-" + hash);						
+						}; //por alguna razon no anda si no hay nada despues del if.
 												
-								  
+						
+							  
 					]]></expression-component>
 					<logger 
 					message="Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 

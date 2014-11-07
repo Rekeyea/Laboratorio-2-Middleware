@@ -8,7 +8,7 @@
 
 -Debido a la utilizacion de apache CXF, si se desea hacer deploy en otro servidor
 que no sea JBOSS, es necesario agregar librerias de apache cxf.
-Por otro lado, la configuracion de web.xml y jbossws-cxf.xml tambien cambia.
+Por otro lado, la configuracion de web.xml tambien cambia.
 
 
 
