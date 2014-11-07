@@ -65,13 +65,13 @@
       <soap:address location="http://localhost:8081/ACMETransactions/services"/>
     </wsdl:port>
   </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8081/ACMETransactions/services</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="ReceiveTransactions" bindingOperationName="ReceiveTransactions" type="Request-Response" outputName="ReceiveTransactionsResponse" inputName="ReceiveTransactions" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Legacy"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8081/ACMETransactions/services</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:acm="ACMEv1">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8081/ACMETransactions/services</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="ReceiveTransactions" bindingOperationName="ReceiveTransactions" type="Request-Response" outputName="ReceiveTransactionsResponse" inputName="ReceiveTransactions" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Legacy"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8081/ACMETransactions/services</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:acm="ACME">
    <soapenv:Header/>
    <soapenv:Body>
       <acm:Transactions>
          <!--1 or more repetitions:-->
          <transactionList>
-            <id>4</id>
+            <id>423</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -84,7 +84,7 @@
             <monto>5</monto>
          </transactionList>
          <transactionList>
-            <id>2</id>
+            <id>23</id>
             <fecha>28072014</fecha>
             <hora>223000</hora>
             <tipo>compra</tipo>
@@ -108,7 +108,8 @@
             <codigoMoneda>USD</codigoMoneda>
             <tipoDispositivo>POS</tipoDispositivo>
             <monto>5</monto>
-         </transactionList>         
+         </transactionList>       
+         
       </acm:Transactions>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ACMEv1/transactions/ReceiveTransactions"/><con:wsrmConfig version="1.2"/></con:call><con:call name="New"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8081/ACMETransactions/services</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:acm="ACMEv1">
@@ -155,7 +156,7 @@
             <tipoDispositivo>POS</tipoDispositivo>
             <monto>5</monto>
          </transactionList>
-         <messageId>19</messageId>
+         <messageId>223</messageId>
       </acm:Transactions>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ACMEv1/transactions/ReceiveTransactions"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ACMEv1/transactions/ReceiveTransactions"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

@@ -14,45 +14,65 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
     
     <flow name="ACME-WS-Proxy-Flow" doc:name="ACME-WS-Proxy-Flow">
         <http:inbound-endpoint exchange-pattern="request-response" address="http://localhost:8081/ACMETransactions/services" doc:name="HTTP Server"/>
-        <cxf:proxy-service  payload="body" doc:name="SOAP Server Proxy"/>
+        <cxf:proxy-service  payload="envelope" doc:name="SOAP Server Proxy"/>
+        
         <enricher source="#[payload]" target="#[payload]" doc:name="Message Enricher">
-            <choice doc:name="Check if has messageId">
-                <when expression= "xpath://*[contains(namespace-uri(), 'ACME')]">
+        	
+            <choice doc:name="Check if has legacy namespace">
+                <when expression= "xpath://*[namespace-uri()='ACME']">
                 <!-- "(message.payload.getElementsByTagName('messageId').getLength() == 0)"> -->
-                    <mulexml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" doc:name="XML to DOM"/>                    
-                    <expression-component doc:name="Add messageId">
+                    
+                    <expression-component doc:name="Add messageId/change namespace">
                     <![CDATA[
 						
 						import java.security.MessageDigest;
-						import java.math.BigInteger;
+						import java.math.BigInteger;						
+						import org.dom4j.*;					
 						
+						document = message.payload;
+						String xmlData = document.asXML();
 						MessageDigest md = MessageDigest.getInstance("SHA-256");
+						md.update(xmlData.getBytes());
 						
-						document = message.payload;		
-						root = document.getDocumentElement();
-						root.setAttribute("xmlns:acm", "ACMEv1");
-
-						md.update(root.getTextContent().getBytes());	
-											
-                        newElement = document.createElement("messageId"); 
-						BigInteger number = new BigInteger(1, md.digest());
-      					String data = number.toString(16);
-                        newElement.setTextContent("legacy-" + data);
-						root.appendChild(newElement);	
+						//Ruta exacta para asegurarme que lo agrego en el lugar correcto.
+						Node transNode = document.selectSingleNode( "/*[local-name()='Envelope']/*[local-name()='Body']/*[local-name()='Transactions']" );
+						
+						//Solo agrego el nodo si no existe.
+						if(transNode.selectSingleNode("./*[local-name()='messageId']")==null){												
+												
+							Element messageIdNode = transNode.addElement("messageId");
+							
+							BigInteger number = new BigInteger(1, md.digest());
+	      					String data = number.toString(16);
+	                        												
+							messageIdNode.setText("legacy-" + data);						
+						}
+						
+												
+						String nuevoXML = document.asXML();
+						
+						//Reemplazo namespace
+						nuevoXML = nuevoXML.replaceAll("\"ACME\"","\"ACMEv1\"");
+						
+						Document newDocument = DocumentHelper.parseText(nuevoXML);
+						message.payload = newDocument;
+						
+						System.out.println(newDocument.asXML());
+						
 								  
 					]]></expression-component>
 					<logger 
-					message="Mensaje no tiene messageId, se le agrego: #[message.payload.getElementsByTagName('messageId').item(0).getTextContent()]" 
+					message="Mensaje es de cliente legacy, con messageId: #[xpath://*[local-name()='messageId']]" 
 					level="INFO" doc:name="Log Legacy"
 					/>
                     <mulexml:dom-to-xml-transformer doc:name="DOM to XML"/>
                 </when>
                 <otherwise>
-                    <logger message="Mensaje tiene messageId, no se realizan acciones." level="INFO" doc:name="Log New"/>
+                    <logger message="Mensaje es de cliente nuevo, no se realizan acciones." level="INFO" doc:name="Log New"/>
                 </otherwise>
             </choice>
         </enricher>
-	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="body"/>
+	    <cxf:proxy-client doc:name="SOAP Client Proxy" payload="envelope"/>
 	    
 	    <http:outbound-endpoint exchange-pattern="request-response" address="http://localhost:8080/ACMETransactions/services" doc:name="SOAP Real Service"/>	    
     </flow>
