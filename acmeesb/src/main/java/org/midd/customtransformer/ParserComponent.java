@@ -19,7 +19,7 @@ public class ParserComponent implements Callable{
 		if(ok){
 			Document doc = context.getMessage().getPayload(org.dom4j.Document.class);
 			String toParse = doc.asXML();
-			String pattern = "(xmlns:.*=)\"ACMEv1\"";
+			String pattern = "(xmlns:?.*=)\"ACMEv1\"";
 			toParse = toParse.replaceAll(pattern,"$1\"ACME\"");
 			
 			try {
