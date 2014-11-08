@@ -19,7 +19,8 @@ public class TransformXML implements Callable {
 		String xmlData = document.asXML();
 		
 		//change namespace
-		xmlData = xmlData.replaceAll("\"ACME\"","\"ACMEv1\"");
+		String pattern = "(xmlns:.*=)\"ACME\"";
+		xmlData = xmlData.replaceAll(pattern,"$1\"ACMEv1\"");
 
 		//get new document and change payload
 		document = DocumentHelper.parseText(xmlData);		

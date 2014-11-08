@@ -42,9 +42,9 @@
 
 % autores
 \author{
-  Cristiano Coelho \\
+  Cristiano Coelho 4.298.259-3\\
   Federico García \\
-  Emiliano Conti \\
+  Emiliano Conti 5.033.483-5\\
   Leonardo Clavijo 5.054.830-5
 }
 
@@ -179,7 +179,7 @@ Existe una serie de problemáticas relativas a la implementación de los web ser
 
 \subsubsection{Cambios}
 La versión mayor se referenciará en el targetnamespace del WSDL, de esta forma genera errores en los clientes legados que invoquen un servicio con una versión incompatible. De esta forma el targetnamespace será de la forma $ACMEvX$ donde $X$ corresponde a la versión mayor. Recordemos que la versión anterior implementada poseía un targetnamespace $ACME$. Entonces el primer cambio realizado es el targetnamespace de $ACME$ a $ACMEv1$.
-La nomenclatura completa se referencia en una etiqueta del WSDL de la forma $wsdl:documentation>Version: X.YY</wsdl:documentation>$.
+La nomenclatura completa se referencia en una etiqueta del WSDL de la forma $<wsdl:documentation>Version: X.YY</wsdl:documentation>$.
 Los cambios a nivel de implementación fueron los siguientes:
 \begin{itemize}
   \item Migración de servidor web Apache Tomcat a JBoss Application Server 7, de esta forma poder utilizar apache CXF como ser el caso de $documentation$ para indicar la versión completa del WSDL.
