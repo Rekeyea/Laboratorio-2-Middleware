@@ -38,12 +38,12 @@
 }
 
 % titulo
-\title{Obligatorio 2 \\ Int. Middleware \\ Grupo } 
+\title{Obligatorio 2 \\ Int. Middleware \\ Grupo 1 } 
 
 % autores
 \author{
   Cristiano Coelho 4.298.259-3\\
-  Federico García \\
+  Federico García 4.561.325-8\\
   Emiliano Conti 5.033.483-5\\
   Leonardo Clavijo 5.054.830-5
 }
@@ -198,6 +198,82 @@ De forma análoga se procede para el tag de versionado incluyendo la siguiente l
 \begin{center}
   @WSDLDocumentation(value = "Version: 1.0", placement = WSDLDocumentation.Placement.TOP)
 \end{center}
+
+\section{Modelo de Calidad}
+En la actualidad existe en la industria un creciente interés por la especificación de los aspectos no funcionales, o de calidad, de los servicios. Para cumplir con estas necesidades es que aparecen los Modelos de Calidad que generalmente se centran en la identificación y clasificación de distintos factores de calidad que se organizan en forma jerárquica y se documentan en dichos modelos.
+Para el presente laboratorio utilizaremos un Modelo de Calidad basado en el S-Cube estudiado en el teórico, haciendo foco en la dimensión la “Performance” y utilizando como factor o atributo de calidad el “tiempo de respuesta”. Cabe destacar que el tiempo de respuesta en  S-Cube es solo uno de los atributos de calidad asociados a la Performance, por lo tanto para tener una visión más precisa de la calidad del web service en lo relacionado a la Performance se deberían aplicar métodos para obtener las métricas de los restantes atributos (Tiempo de transacción, throughput, latencia, tiempo de ejecución, latencia de cola), sin embargo el tiempo de respuesta es el único que se pide para el presente obligatorio.
+La métrica utilizada como instrumento de medida para el factor “tiempo de respuesta” es la siguiente. Se medirá a partir de la implementación de timestamps a nivel de ESB, que miden los tiempos desde que un mensaje llega al middleware hasta que sale del mismo (con exactitud de nanosegundos), obteniendo mediciones intermedias correspondientes al tiempo de procesamiento solo de la llamada al web service en el back end.
+Para realizar las pruebas finalmente se utilizó la herramienta SOAPUI para enviar un conjunto de datos simple y reducido (3 transacciones validas) al ESB de forma secuencial uno por uno.
+Los resultados de las pruebas tanto para el cliente Legacy como el Nuevo, se encuentran en las tablas tabla[\ref{tabla:datoslegacy}] y tabla[\ref{tabla:datosnew}] respectivamente.
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{| c | c | c | c |}
+\hline
+    \multicolumn{1}{|c}{Caso}&
+    \multicolumn{1}{|c}{RespMidd}&
+    \multicolumn{1}{|c|}{RespWS}&
+    \multicolumn{1}{|c|}{RespOnlyMidd} \\ \hline
+    
+1 & 19.350741 & 5.301935 &14.048806\\ \hline
+2 & 17.05937 & 3.929897 & 13.129473\\ \hline
+3 & 15.619519 & 4.548652 & 11.070867\\ \hline
+4 & 15.439171 &4.617932 &10.821239\\ \hline
+5 & 17.269775 & 4.503932 & 12.765843\\ \hline
+6 & 20.231219 & 6.407482 & 13.823737\\ \hline
+7 & 15.416077 & 4.201519 & 11.214558\\ \hline
+8 & 16.168993 & 4.933174 & 11.235819\\ \hline
+9 & 16.717368 & 4.724602 & 11.992766\\ \hline
+10 & 16.568911 & 4.771887 & 11.797024\\ \hline
+Prom & 16.9841144 & 4.7941012 & 12.1900132 \\ \hline%%prom
+
+    \end{tabular}
+\end{center}
+    \caption{Métricas Legacy}
+    \label{tabla:datoslegacy}
+\end{table}
+
+
+
+\begin{table}
+\begin{center}
+    \begin{tabular}{| c | c | c | c |}
+\hline
+    \multicolumn{1}{|c}{Caso}&
+    \multicolumn{1}{|c}{RespMidd}&
+    \multicolumn{1}{|c|}{RespWS}&
+    \multicolumn{1}{|c|}{RespOnlyMidd} \\ \hline
+    
+1 & 9.019593 & 4.809227 &4.210316\\ \hline
+2 & 6.933862 & 4.084953 &2.848909\\ \hline
+3 & 7.444848 & 4.058927 &3.385921\\ \hline
+4 & 7.717569 & 4.033268 &3.684301\\ \hline
+5 & 7.138771 & 3.877846 &3.260925\\ \hline
+6 & 6.84992 & 3.850354 & 2.999566\\ \hline
+7 & 7.41589 & 4.215082 & 3.200808\\ \hline
+8 & 9.496855 & 5.823917 & 6.672938\\ \hline
+9 & 7.883621 & 4.851065 & 3.032556\\ \hline
+10 & 7.483704 & 4.351442 & 3.132262\\ \hline
+Prom & 7.7384633 & 4.3956081 & 3.6428502\\ \hline
+
+    \end{tabular}
+\end{center}
+    \caption{Métricas Nuevo}
+    \label{tabla:datosnew}
+\end{table}
+
+
+RespMidd: Es el tiempo del mensaje en el middleware ignorando el tiempo de red entre el cliente y el ESB (todas las mediciones se realizan dentro del mismo). Además no se tiene en cuenta el tiempo de parseo del pedido HTTP a mensaje ESB y viceversa pero son considerados despreciables.
+RespWS: Tiempo desde que el ESB envía el pedido al WS hasta que recibe la respuesta
+RespOnlyMidd: Es RespMidd-RespWS, dando como resultado solo el tiempo de procesamiento del ESB.
+Analizando los resultados y observando los promedios en cada caso podemos sacar como conclusiones que:
+\begin{itemize}
+  \item El tiempo de respuesta del WS permanece incambiado para los casos de clientes Legacy y Nuevos, encontrándose en el entorno de los 4.5ms.
+  \item El tiempo de procesamiento dentro del middleware para el caso de los clientes Legacy es mucho mayor debido a los procesamientos para que se adapte a consumir el nuevo servicio, encontrándose en el entorno de los 12ms contra los 3.5ms para el caso de los clientes nuevos.
+\end{itemize}
+
+Estos resultados si bien fueron medidos en un entorno de desarrollo ( por lo que los resultados podrían ser ligeramente diferentes en producción), son considerados representativos para medir la performance del sistema en condiciones normales.
+
 
 %\bibliographystyle{abbrv}
 %\bibliography{simple}
