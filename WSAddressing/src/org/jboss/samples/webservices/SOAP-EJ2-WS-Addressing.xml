@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="ServicioAddressing" resourceRoot="" soapui-version="5.0.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" wsaVersion="200508" name="ServicioAddressingServiceSoapBinding" type="wsdl" bindingName="{http://webservices.samples.jboss.org/}ServicioAddressingServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/WSAddressing/ServicioAddressing?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/WSAddressing/ServicioAddressing?wsdl"><con:part><con:url>http://localhost:8080/WSAddressing/ServicioAddressing?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="ServicioAddressingService" targetNamespace="http://webservices.samples.jboss.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:tns="http://webservices.samples.jboss.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://webservices.samples.jboss.org/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="Mensajes" type="tns:mensaje"/>
+      <xs:element name="entradaWS2" type="tns:entradaWS2"/>
+      <xs:element name="params" type="tns:params"/>
+      <xs:complexType name="params">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="paramMensaje" type="tns:mensaje"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="mensaje">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="mensaje" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="entradaWS2">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="respuesta" type="tns:mensaje"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="llamadaDesacoplada">
+    <wsdl:part element="tns:params" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="llamadaDesacopladaResponse">
+    <wsdl:part element="tns:entradaWS2" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ServicioAddressing">
+    <wsdl:operation name="llamadaDesacoplada">
+      <wsdl:input message="tns:llamadaDesacoplada" name="llamadaDesacoplada" wsam:Action="http://webservices.samples.jboss.org/ServicioAddressing/llamadaDesacopladaRequest" wsaw:Action="http://webservices.samples.jboss.org/ServicioAddressing/llamadaDesacopladaRequest"></wsdl:input>
+      <wsdl:output message="tns:llamadaDesacopladaResponse" name="llamadaDesacopladaResponse" wsam:Action="http://webservices.samples.jboss.org/ServicioAddressing/llamadaDesacopladaResponse" wsaw:Action="http://webservices.samples.jboss.org/ServicioAddressing/llamadaDesacopladaResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServicioAddressingServiceSoapBinding" type="tns:ServicioAddressing">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsaw:UsingAddressing wsdl:required="true"/>
+    <wsp:PolicyReference URI="#ServicioAddressingServiceSoapBinding_WSAM_Addressing_Policy"/>
+    <wsdl:operation name="llamadaDesacoplada">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="llamadaDesacoplada">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="llamadaDesacopladaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServicioAddressingService">
+    <wsdl:port binding="tns:ServicioAddressingServiceSoapBinding" name="ServicioAddressingPort">
+      <soap:address location="http://localhost:8080/WSAddressing/ServicioAddressing"/>
+    </wsdl:port>
+  </wsdl:service>
+  <wsp:Policy wsu:Id="ServicioAddressingServiceSoapBinding_WSAM_Addressing_Policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <wsam:Addressing>
+      <wsp:Policy/>
+    </wsam:Addressing>
+  </wsp:Policy>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/WSAddressing/ServicioAddressing</con:endpoint></con:endpoints><con:operation isOneWay="false" action="" name="llamadaDesacoplada" bindingOperationName="llamadaDesacoplada" type="Request-Response" outputName="llamadaDesacopladaResponse" inputName="llamadaDesacoplada" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call name="Request 1" useWsAddressing="true"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/WSAddressing/ServicioAddressing</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://webservices.samples.jboss.org/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <web:params>
+         <!--Optional:-->
+         <paramMensaje>
+            <!--Optional:-->
+            <mensaje>holis</mensaje>
+         </paramMensaje>
+      </web:params>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://webservices.samples.jboss.org/ServicioAddressing/llamadaDesacopladaRequest" generateMessageId="true" addDefaultAction="true" replyTo="" addDefaultTo="true"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
